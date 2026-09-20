@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JA Motors — Fleet & Profit Intelligence</title>
+
+  <!-- iOS & Favicon Setup (Using JA Logo) -->
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JA Motors">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            darkbg: '#05070a',
+            surface: '#0d131f',
+            surfacelight: '#151d2d',
+            bordercol: '#1e293b',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #05070a; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+  </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen flex justify-center p-3 sm:p-6 selection:bg-purple-500 selection:text-white">
+
+<div class="w-full max-w-xl flex flex-col gap-6">
+  
+  <!-- Header with JA Logo -->
+  <header class="flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <!-- JA Logo with White Background for Contrast -->
+        <div class="w-12 h-12 rounded-xl bg-white p-1 flex items-center justify-center border border-white/20 shadow-lg shadow-white/5 overflow-hidden flex-shrink-0">
+          <img src="logo.png" onerror="this.src='icon.png'" class="w-full h-full object-contain" alt="JA Logo">
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">JA MOTORS</h1>
+          <p class="text-xs text-slate-400 font-medium">Vehicle Asset & Profit Tracker</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="shareViaWhatsApp()" title="Share via WhatsApp" class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-all flex items-center justify-center text-sm">
+          <i class="fa-brands fa-whatsapp fa-lg"></i>
+        </button>
+        <button onclick="importData()" title="Import Data Code" class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center text-sm">
+          <i class="fa-solid fa-code-merge"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="grid grid-cols-3 gap-1 bg-surface p-1.5 rounded-2xl border border-bordercol shadow-inner">
+      <button onclick="switchTab(event, 'tab-entry')" class="tab-btn active py-2.5 px-3 rounded-xl font-bold text-xs tracking-wide transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-circle-plus text-sm"></i> Add Vehicle
+      </button>
+      <button onclick="switchTab(event, 'tab-capital')" class="tab-btn py-2.5 px-3 rounded-xl font-bold text-xs tracking-wide transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-vault text-sm"></i> Capital
+      </button>
+      <button onclick="switchTab(event, 'tab-ledger')" class="tab-btn py-2.5 px-3 rounded-xl font-bold text-xs tracking-wide transition-all flex items-center justify-center gap-2 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-chart-line text-sm"></i> Ledger
+      </button>
+    </div>
+  </header>
+
+  <!-- TAB 1: VEHICLE ENTRY -->
+  <div id="tab-entry" class="tab-content active flex flex-col gap-5">
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex items-center gap-2.5 text-xs font-black tracking-wider text-slate-300">
+        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-bold">1</span>
+        VEHICLE SPECIFICATIONS
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Brand</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-car text-slate-500 text-xs"></i>
+            <input type="text" id="brand" placeholder="e.g. BMW" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Model</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-tag text-slate-500 text-xs"></i>
+            <input type="text" id="model" placeholder="e.g. 520i M-Sport" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Trim / Edition</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-layer-group text-slate-500 text-xs"></i>
+            <input type="text" id="trim" placeholder="Matte Edition" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Year</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-calendar text-slate-500 text-xs"></i>
+            <input type="number" id="year" placeholder="2026" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="col-span-2 flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">KM / Mileage</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-road text-slate-500 text-xs"></i>
+            <input type="number" id="mileage" placeholder="0" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex items-center gap-2.5 text-xs font-black tracking-wider text-slate-300">
+        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-bold">2</span>
+        CONDITION & OPTIONS
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Accident History</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2 flex items-center gap-2">
+            <select id="accident" class="bg-transparent border-none text-white text-xs w-full outline-none cursor-pointer">
+              <option class="bg-surface">Clean (No Crash)</option>
+              <option class="bg-surface">Minor Damage</option>
+              <option class="bg-surface">Repaired</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Warranty Status</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2 flex items-center gap-2">
+            <select id="warranty" class="bg-transparent border-none text-white text-xs w-full outline-none cursor-pointer">
+              <option class="bg-surface">No Warranty</option>
+              <option class="bg-surface">Active Warranty</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Induction</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2 flex items-center gap-2">
+            <select id="turbo" class="bg-transparent border-none text-white text-xs w-full outline-none cursor-pointer">
+              <option class="bg-surface">Non-Turbo</option>
+              <option class="bg-surface">Turbocharged</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fuel Type</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2 flex items-center gap-2">
+            <select id="fuel" class="bg-transparent border-none text-white text-xs w-full outline-none cursor-pointer">
+              <option class="bg-surface">Gasoline</option>
+              <option class="bg-surface">Diesel</option>
+              <option class="bg-surface">Hybrid</option>
+              <option class="bg-surface">Electric</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex items-center gap-2.5 text-xs font-black tracking-wider text-slate-300">
+        <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-bold">3</span>
+        FINANCIALS, REPAIRS & DATE
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bought Price ($)</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-dollar-sign text-slate-500 text-xs"></i>
+            <input type="number" id="boughtPrice" placeholder="30000" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plate Cost ($)</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-id-card text-slate-500 text-xs"></i>
+            <input type="number" id="plateCost" placeholder="1050" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Repair Cost ($)</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-wrench text-slate-500 text-xs"></i>
+            <input type="number" id="repairCost" placeholder="0" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Target Sell Price ($)</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-bullseye text-slate-500 text-xs"></i>
+            <input type="number" id="targetSellPrice" placeholder="35000" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+        <div class="col-span-2 flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date Bought</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-calendar-days text-slate-500 text-xs"></i>
+            <input type="date" id="dateBought" class="bg-transparent border-none text-white text-sm w-full outline-none">
+          </div>
+        </div>
+        <div class="col-span-2 flex flex-col gap-1.5">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vehicle Note / Highlight</label>
+          <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+            <i class="fa-solid fa-note-sticky text-slate-500 text-xs"></i>
+            <input type="text" id="notes" placeholder="e.g. Paint job scheduled, clean title" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveVehicle()" class="mt-2 w-full py-3.5 px-5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-floppy-disk text-base"></i> Save Bought Vehicle
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 2: MY CAPITAL -->
+  <div id="tab-capital" class="tab-content hidden flex-col gap-5">
+    <div>
+      <h2 class="text-2xl font-black tracking-tight">My <span class="text-purple-400">Capital</span></h2>
+      <p class="text-slate-400 text-xs mt-1">Manage total cash reserves and track vehicle purchase, plate, and repair deductions.</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-surface border border-bordercol rounded-2xl p-4 flex items-center gap-3.5 shadow-xl">
+        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <div class="overflow-hidden">
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Starting Capital</div>
+          <div class="text-lg font-black text-purple-300 truncate" id="displayStartingCapital">$0</div>
+        </div>
+      </div>
+      <div class="bg-surface border border-bordercol rounded-2xl p-4 flex items-center gap-3.5 shadow-xl">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+        <div class="overflow-hidden">
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Available Cash</div>
+          <div class="text-lg font-black text-emerald-400 truncate" id="displayAvailableCash">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex items-center gap-2.5 text-xs font-black tracking-wider text-slate-300">
+        <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-bold">1</span>
+        UPDATE TOTAL FUNDS
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Enter Capital Amount ($)</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3.5 py-2.5 flex items-center gap-2 focus-within:border-purple-500 transition-colors">
+          <i class="fa-solid fa-vault text-slate-500 text-xs"></i>
+          <input type="number" id="capitalInput" placeholder="e.g. 140000" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-600">
+        </div>
+      </div>
+      <button onclick="updateCapital()" class="w-full py-3.5 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm shadow-lg shadow-purple-600/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrows-rotate text-sm"></i> Update Capital Funds
+      </button>
+    </div>
+
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="flex items-center gap-2.5 text-xs font-black tracking-wider text-slate-300">
+        <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-bold">2</span>
+        CAPITAL INVENTORY DEDUCTIONS
+      </div>
+      <div id="deductionsList" class="flex flex-col gap-2.5"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: CARS SOLD & PROFIT LEDGER -->
+  <div id="tab-ledger" class="tab-content hidden flex-col gap-5">
+    <div>
+      <h2 class="text-2xl font-black tracking-tight">Cars Sold & <span class="text-emerald-400">Profit Ledger</span></h2>
+      <p class="text-slate-400 text-xs mt-1">Real-time calculations for total net gains and individual 50/50 partner splits.</p>
+    </div>
+
+    <!-- Lifetime Profit Overview -->
+    <div class="bg-surface border border-bordercol rounded-2xl p-4 flex items-center gap-3.5 shadow-xl">
+      <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg flex-shrink-0">
+        <i class="fa-solid fa-chart-pie"></i>
+      </div>
+      <div class="overflow-hidden flex-1">
+        <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total Lifetime Net Profit</div>
+        <div class="text-lg font-black text-emerald-400 truncate" id="displayLifetimeProfit">$0</div>
+      </div>
+    </div>
+
+    <!-- Monthly Automatic Calculator & 50/50 Split -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-surface border border-bordercol rounded-2xl p-4 flex items-center gap-3.5 shadow-xl">
+        <div class="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="overflow-hidden flex-1">
+          <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider truncate">This Month Total</div>
+          <div class="text-base font-black text-blue-400 truncate" id="displayMonthProfit">$0</div>
+        </div>
+      </div>
+
+      <div class="bg-surface border border-purple-500/30 bg-purple-500/[0.03] rounded-2xl p-4 flex items-center gap-3.5 shadow-xl">
+        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-lg flex-shrink-0">
+          <i class="fa-solid fa-user-group"></i>
+        </div>
+        <div class="overflow-hidden flex-1">
+          <div class="text-[10px] uppercase font-bold text-purple-400 tracking-wider truncate">Split (/2 Each)</div>
+          <div class="text-base font-black text-purple-300 truncate" id="displayMonthSplit">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="bg-surface border border-bordercol rounded-2xl px-4 py-3 flex items-center gap-3 shadow-inner focus-within:border-purple-500 transition-colors">
+      <i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i>
+      <input type="text" id="searchInput" placeholder="Search Vehicles, Notes, Brands..." oninput="renderLedger()" class="bg-transparent border-none text-white text-sm w-full outline-none placeholder:text-slate-500">
+    </div>
+
+    <!-- Active Inventory Section -->
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="text-xs font-black tracking-wider text-slate-300 flex items-center gap-2">
+        <i class="fa-solid fa-car text-amber-400"></i> ACTIVE INVENTORY (CLICK TO SELL)
+      </div>
+      <div id="inventoryList" class="flex flex-col gap-3"></div>
+    </div>
+
+    <!-- Completed Sales Section -->
+    <div class="bg-surface border border-bordercol rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div class="text-xs font-black tracking-wider text-slate-300 flex items-center gap-2">
+        <i class="fa-solid fa-receipt text-emerald-400"></i> COMPLETED SALES
+      </div>
+      <div id="soldList" class="flex flex-col gap-3"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ALL-IN-ONE EDIT MODAL POPUP -->
+<div id="editModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-surface border border-bordercol rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
+    
+    <div class="flex items-center justify-between border-b border-bordercol pb-3">
+      <div class="flex items-center gap-2 text-sm font-extrabold text-white">
+        <i class="fa-solid fa-pen-to-square text-purple-400"></i> Edit Vehicle & Expenses
+      </div>
+      <button onclick="closeEditModal()" class="w-8 h-8 rounded-lg bg-darkbg border border-bordercol text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <input type="hidden" id="editVehicleId">
+
+    <div class="grid grid-cols-2 gap-3">
+      <div class="col-span-2 flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vehicle Title</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2">
+          <input type="text" id="editTitle" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bought Price ($)</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2">
+          <input type="number" id="editBoughtPrice" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Plate Cost ($)</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2">
+          <input type="number" id="editPlateCost" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Repair Cost ($)</label>
+        <div class="bg-darkbg border border-amber-500/30 rounded-xl px-3 py-2">
+          <input type="number" id="editRepairCost" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Target Sell Price ($)</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2">
+          <input type="number" id="editTargetSellPrice" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <div class="col-span-2 flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date Bought</label>
+        <div class="bg-darkbg border border-bordercol rounded-xl px-3 py-2">
+          <input type="date" id="editDateBought" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+        </div>
+      </div>
+
+      <!-- Sold Vehicle Specific Fields -->
+      <div id="soldFieldsWrapper" class="col-span-2 grid grid-cols-2 gap-3 border-t border-bordercol pt-3 mt-1">
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Actual Sell Price ($)</label>
+          <div class="bg-darkbg border border-emerald-500/30 rounded-xl px-3 py-2">
+            <input type="number" id="editActualSellPrice" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Date Sold</label>
+          <div class="bg-darkbg border border-emerald-500/30 rounded-xl px-3 py-2">
+            <input type="date" id="editDateSold" class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Field -->
+      <div class="col-span-2 flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-yellow-400 uppercase tracking-wider">Vehicle Notes / Details</label>
+        <div class="bg-darkbg border border-yellow-500/30 rounded-xl px-3 py-2">
+          <textarea id="editNotes" rows="2" placeholder="Add custom notes (shows prominently on vehicle card)..." class="bg-transparent border-none text-white text-xs sm:text-sm w-full outline-none resize-none"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2 pt-2">
+      <button onclick="closeEditModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-colors">Cancel</button>
+      <button onclick="saveVehicleEdits()" class="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/20 transition-all">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let startingCapital = parseFloat(localStorage.getItem('startingCapital')) || 0;
+  let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+
+  document.getElementById('dateBought').valueAsDate = new Date();
+  
+  checkUrlSyncData();
+  updateUI();
+
+  function checkUrlSyncData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const syncData = urlParams.get('syncData');
+    if (syncData) {
+      applyData(syncData);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
+  function applyData(str) {
+    try {
+      let raw = str.trim();
+      if (raw.includes('syncData=')) {
+        raw = raw.split('syncData=')[1];
+      }
+      const decoded = JSON.parse(decodeURIComponent(raw));
+      if (decoded.startingCapital !== undefined && Array.isArray(decoded.vehicles)) {
+        startingCapital = decoded.startingCapital;
+        vehicles = decoded.vehicles;
+        localStorage.setItem('startingCapital', startingCapital);
+        localStorage.setItem('vehicles', JSON.stringify(vehicles));
+        alert("✅ Data successfully synced!");
+        updateUI();
+      } else {
+        alert("❌ Invalid data structure.");
+      }
+    } catch (e) {
+      alert("❌ Could not read the data. Please ensure you copied the full message or link.");
+    }
+  }
+
+  function shareViaWhatsApp() {
+    const payload = { startingCapital, vehicles };
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    const shareableUrl = `${window.location.origin}${window.location.pathname}?syncData=${encoded}`;
+    const text = `JA Motors Fleet Data:\n\n${shareableUrl}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+  }
+
+  function importData() {
+    const input = prompt("Paste your partner's WhatsApp link or data string here:");
+    if (input) applyData(input);
+  }
+
+  function switchTab(evt, tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(el => {
+      el.classList.remove('active', 'bg-surface', 'text-white', 'shadow-md');
+      el.classList.add('text-slate-400');
+    });
+
+    const targetTab = document.getElementById(tabId);
+    targetTab.classList.remove('hidden');
+    targetTab.classList.add('flex');
+
+    let btn = evt ? evt.currentTarget : document.querySelector(`[onclick*="${tabId}"]`);
+    if (btn) {
+      btn.classList.add('active', 'bg-surface', 'text-white', 'shadow-md');
+      btn.classList.remove('text-slate-400');
+    }
+  }
+
+  const activeTabBtn = document.querySelector('.tab-btn');
+  if(activeTabBtn) activeTabBtn.classList.add('bg-surface', 'text-white', 'shadow-md');
+
+  function updateCapital() {
+    const val = parseFloat(document.getElementById('capitalInput').value);
+    if (!isNaN(val)) {
+      startingCapital = val;
+      localStorage.setItem('startingCapital', startingCapital);
+      document.getElementById('capitalInput').value = '';
+      updateUI();
+    }
+  }
+
+  function saveVehicle() {
+    const brand = document.getElementById('brand').value || 'Unknown';
+    const model = document.getElementById('model').value || 'Vehicle';
+    const trim = document.getElementById('trim').value || '';
+    const year = document.getElementById('year').value || '2026';
+    const boughtPrice = parseFloat(document.getElementById('boughtPrice').value) || 0;
+    const plateCost = parseFloat(document.getElementById('plateCost').value) || 0;
+    const repairCost = parseFloat(document.getElementById('repairCost').value) || 0;
+    const targetSellPrice = parseFloat(document.getElementById('targetSellPrice').value) || 0;
+    const dateBought = document.getElementById('dateBought').value;
+    const notes = document.getElementById('notes').value || '';
+
+    const newVehicle = {
+      id: Date.now(),
+      title: `${brand.toUpperCase()} ${model} ${year} ${trim}`.trim(),
+      boughtPrice,
+      plateCost,
+      repairCost,
+      targetSellPrice,
+      dateBought,
+      notes,
+      isSold: false,
+      actualSellPrice: 0,
+      dateSold: null,
+      profit: 0
+    };
+
+    vehicles.push(newVehicle);
+    saveAndRefresh();
+
+    document.getElementById('brand').value = '';
+    document.getElementById('model').value = '';
+    document.getElementById('trim').value = '';
+    document.getElementById('boughtPrice').value = '';
+    document.getElementById('plateCost').value = '';
+    document.getElementById('repairCost').value = '';
+    document.getElementById('targetSellPrice').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('mileage').value = '';
+    
+    switchTab(null, 'tab-ledger');
+  }
+
+  function openEditModal(id) {
+    const v = vehicles.find(item => item.id === id);
+    if (!v) return;
+
+    document.getElementById('editVehicleId').value = v.id;
+    document.getElementById('editTitle').value = v.title || '';
+    document.getElementById('editBoughtPrice').value = v.boughtPrice || 0;
+    document.getElementById('editPlateCost').value = v.plateCost || 0;
+    document.getElementById('editRepairCost').value = v.repairCost || 0;
+    document.getElementById('editTargetSellPrice').value = v.targetSellPrice || 0;
+    document.getElementById('editDateBought').value = v.dateBought || '';
+    document.getElementById('editNotes').value = v.notes || '';
+
+    const soldWrapper = document.getElementById('soldFieldsWrapper');
+    if (v.isSold) {
+      soldWrapper.classList.remove('hidden');
+      soldWrapper.classList.add('grid');
+      document.getElementById('editActualSellPrice').value = v.actualSellPrice || 0;
+      document.getElementById('editDateSold').value = v.dateSold || '';
+    } else {
+      soldWrapper.classList.add('hidden');
+      soldWrapper.classList.remove('grid');
+    }
+
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+  }
+
+  function saveVehicleEdits() {
+    const id = parseInt(document.getElementById('editVehicleId').value);
+    const vehicle = vehicles.find(v => v.id === id);
+    if (!vehicle) return;
+
+    vehicle.title = document.getElementById('editTitle').value;
+    vehicle.boughtPrice = parseFloat(document.getElementById('editBoughtPrice').value) || 0;
+    vehicle.plateCost = parseFloat(document.getElementById('editPlateCost').value) || 0;
+    vehicle.repairCost = parseFloat(document.getElementById('editRepairCost').value) || 0;
+    vehicle.targetSellPrice = parseFloat(document.getElementById('editTargetSellPrice').value) || 0;
+    vehicle.dateBought = document.getElementById('editDateBought').value;
+    vehicle.notes = document.getElementById('editNotes').value;
+
+    if (vehicle.isSold) {
+      vehicle.actualSellPrice = parseFloat(document.getElementById('editActualSellPrice').value) || 0;
+      vehicle.dateSold = document.getElementById('editDateSold').value;
+      const totalCost = vehicle.boughtPrice + (vehicle.plateCost || 0) + (vehicle.repairCost || 0);
+      vehicle.profit = vehicle.actualSellPrice - totalCost;
+    }
+
+    closeEditModal();
+    saveAndRefresh();
+  }
+
+  function deleteVehicle(id) {
+    if (confirm("Are you sure you want to delete this vehicle record?")) {
+      vehicles = vehicles.filter(v => v.id !== id);
+      saveAndRefresh();
+    }
+  }
+
+  function sellVehicle(id) {
+    const vehicle = vehicles.find(v => v.id === id);
+    if (!vehicle) return;
+
+    const sellPriceInput = prompt(`Enter actual final selling price for ${vehicle.title}:`, vehicle.targetSellPrice);
+    if (sellPriceInput === null) return;
+
+    const actualSellPrice = parseFloat(sellPriceInput);
+    if (isNaN(actualSellPrice)) return;
+
+    vehicle.isSold = true;
+    vehicle.actualSellPrice = actualSellPrice;
+    vehicle.dateSold = new Date().toISOString().split('T')[0];
+    
+    const totalCost = vehicle.boughtPrice + (vehicle.plateCost || 0) + (vehicle.repairCost || 0);
+    vehicle.profit = vehicle.actualSellPrice - totalCost;
+
+    saveAndRefresh();
+  }
+
+  function saveAndRefresh() {
+    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+    updateUI();
+  }
+
+  function updateUI() {
+    const activeVehiclesTotalCost = vehicles
+      .filter(v => !v.isSold)
+      .reduce((sum, v) => sum + v.boughtPrice + (v.plateCost || 0) + (v.repairCost || 0), 0);
+
+    const availableCash = startingCapital - activeVehiclesTotalCost;
+
+    document.getElementById('displayStartingCapital').textContent = `$${startingCapital.toLocaleString()}`;
+    document.getElementById('displayAvailableCash').textContent = `$${availableCash.toLocaleString()}`;
+
+    const deductionsList = document.getElementById('deductionsList');
+    deductionsList.innerHTML = '';
+    const activeDeductions = vehicles.filter(v => !v.isSold);
+    
+    if (activeDeductions.length === 0) {
+      deductionsList.innerHTML = `<div class="text-xs text-slate-500 italic py-2">No active inventory deductions.</div>`;
+    } else {
+      activeDeductions.forEach(v => {
+        const totalDeduction = v.boughtPrice + (v.plateCost || 0) + (v.repairCost || 0);
+        let breakdown = [];
+        if (v.plateCost) breakdown.push(`+$${v.plateCost.toLocaleString()} Plate`);
+        if (v.repairCost) breakdown.push(`+$${v.repairCost.toLocaleString()} Repair`);
+        const breakdownStr = breakdown.length > 0 ? ` (${breakdown.join(', ')})` : '';
+
+        const noteBadge = v.notes ? `
+          <div class="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-medium max-w-full truncate">
+            <i class="fa-solid fa-note-sticky text-[9px]"></i> ${v.notes}
+          </div>
+        ` : '';
+
+        deductionsList.innerHTML += `
+          <div class="bg-darkbg border border-bordercol rounded-xl p-3.5 flex flex-col gap-2">
+            <div class="flex justify-between items-start gap-3">
+              <div class="overflow-hidden">
+                <div class="font-bold text-xs truncate text-slate-100">${v.title}</div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">Bought: ${v.dateBought}${breakdownStr}</div>
+                ${noteBadge}
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="text-rose-400 font-extrabold text-xs">-$${totalDeduction.toLocaleString()}</div>
+                <button onclick="openEditModal(${v.id})" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-semibold transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteVehicle(${v.id})" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white flex items-center justify-center text-xs transition-colors"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    const lifetimeProfit = vehicles
+      .filter(v => v.isSold)
+      .reduce((sum, v) => sum + v.profit, 0);
+
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const thisMonthProfit = vehicles
+      .filter(v => v.isSold && v.dateSold && v.dateSold.startsWith(currentMonth))
+      .reduce((sum, v) => sum + v.profit, 0);
+
+    const thisMonthSplit = thisMonthProfit / 2;
+
+    document.getElementById('displayLifetimeProfit').textContent = `$${lifetimeProfit.toLocaleString()}`;
+    document.getElementById('displayMonthProfit').textContent = `$${thisMonthProfit.toLocaleString()}`;
+    document.getElementById('displayMonthSplit').textContent = `$${thisMonthSplit.toLocaleString()}`;
+
+    renderLedger();
+  }
+
+  function renderLedger() {
+    const query = (document.getElementById('searchInput').value || '').toLowerCase();
+
+    const inventoryList = document.getElementById('inventoryList');
+    inventoryList.innerHTML = '';
+    const activeItems = vehicles.filter(v => 
+      !v.isSold && 
+      (v.title.toLowerCase().includes(query) || (v.notes && v.notes.toLowerCase().includes(query)))
+    );
+    
+    if (activeItems.length === 0) {
+      inventoryList.innerHTML = `<div class="text-xs text-slate-500 italic py-2">No matching active inventory found.</div>`;
+    } else {
+      activeItems.forEach(v => {
+        const totalCost = v.boughtPrice + (v.plateCost || 0) + (v.repairCost || 0);
+        let breakdown = [];
+        if (v.plateCost) breakdown.push(`$${v.plateCost} Plt`);
+        if (v.repairCost) breakdown.push(`$${v.repairCost} Rep`);
+        const extraStr = breakdown.length > 0 ? ` [${breakdown.join(' | ')}]` : '';
+
+        const noteBadge = v.notes ? `
+          <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-medium">
+            <i class="fa-solid fa-note-sticky text-amber-400 text-xs"></i> <span>${v.notes}</span>
+          </div>
+        ` : '';
+
+        inventoryList.innerHTML += `
+          <div class="bg-darkbg border border-bordercol rounded-xl p-3.5 flex flex-col gap-2">
+            <div class="flex justify-between items-start gap-3">
+              <div class="overflow-hidden">
+                <div class="font-bold text-xs truncate text-slate-100">${v.title}</div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">Bought: ${v.dateBought} | Total Cost: $${totalCost.toLocaleString()}${extraStr}</div>
+              </div>
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="openEditModal(${v.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors" title="Edit Car & Notes"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="sellVehicle(${v.id})" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-sm">Mark Sold</button>
+              </div>
+            </div>
+            ${noteBadge}
+          </div>
+        `;
+      });
+    }
+
+    const soldList = document.getElementById('soldList');
+    soldList.innerHTML = '';
+    const soldItems = vehicles.filter(v => 
+      v.isSold && 
+      (v.title.toLowerCase().includes(query) || (v.notes && v.notes.toLowerCase().includes(query)))
+    );
+
+    if (soldItems.length === 0) {
+      soldList.innerHTML = `<div class="text-xs text-slate-500 italic py-2">No completed sales recorded.</div>`;
+    } else {
+      soldItems.forEach(v => {
+        const totalCost = v.boughtPrice + (v.plateCost || 0) + (v.repairCost || 0);
+        const sign = v.profit >= 0 ? '+' : '';
+        const eachSplit = v.profit / 2;
+
+        const noteBadge = v.notes ? `
+          <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-medium">
+            <i class="fa-solid fa-note-sticky text-amber-400 text-xs"></i> <span>${v.notes}</span>
+          </div>
+        ` : '';
+
+        soldList.innerHTML += `
+          <div class="bg-darkbg border border-bordercol rounded-xl p-3.5 flex flex-col gap-2">
+            <div class="flex justify-between items-start gap-3">
+              <div class="overflow-hidden">
+                <div class="font-bold text-xs truncate text-slate-100">${v.title}</div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">Bought: ${v.dateBought} | Sold: ${v.dateSold} ($${v.actualSellPrice.toLocaleString()})</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">Total Cost: $${totalCost.toLocaleString()} (Car + Plate + Repair)</div>
+              </div>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <div class="text-right">
+                  <div class="text-emerald-400 font-extrabold text-xs">${sign}$${v.profit.toLocaleString()} Total</div>
+                  <div class="text-purple-400 font-semibold text-[10px]">${sign}$${eachSplit.toLocaleString()} / person</div>
+                </div>
+                <button onclick="openEditModal(${v.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-colors" title="Edit Car & Notes"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteVehicle(${v.id})" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white flex items-center justify-center text-xs transition-colors"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            </div>
+            ${noteBadge}
+          </div>
+        `;
+      });
+    }
+  }
+</script>
+</body>
+</html>
